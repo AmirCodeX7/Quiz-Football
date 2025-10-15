@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Football Quiz Pro</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    
+    <!-- Floating Footballs Background -->
+    <div id="floating-footballs"></div>
+    
+    <!-- Music Controls -->
+    <div class="music-controls">
+        <button id="musicToggle" class="btn btn-sm glass-card text-white me-2">
+            <i class="fas fa-music"></i>
+        </button>
+        <input type="range" id="volumeSlider" class="volume-slider" min="0" max="100" value="50">
+    </div>
+    
+    <!-- Audio Elements -->
+    <audio id="backgroundMusic" loop>
+        <source src="data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBSuBzvLZiTYIG2m98OScTgwOUarm7blmGgU7k9n1unEiBC13yO/eizEIHWq+8+OWT" type="audio/wav">
+    </audio>
+    <audio id="correctSound" preload="auto">
+        <source src="data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBSuBzvLZiTYIG2m98OScTgwOUarm7blmGgU7k9n1unEiBC13yO/eizEIHWq+8+OWT" type="audio/wav">
+    </audio>
+    <audio id="incorrectSound" preload="auto">
+        <source src="data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBSuBzvLZiTYIG2m98OScTgwOUarm7blmGgU7k9n1unEiBC13yO/eizEIHWq+8+OWT" type="audio/wav">
+    </audio>
+    <audio id="coinSound" preload="auto">
+        <source src="data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBSuBzvLZiTYIG2m98OScTgwOUarm7blmGgU7k9n1unEiBC13yO/eizEIHWq+8+OWT" type="audio/wav">
+    </audio>
+
+    <div class="container-fluid p-0">
+        <!-- Landing/Profile Dashboard -->
+        <div id="landingScreen" class="min-h-screen d-flex align-items-center justify-content-center p-4">
+            <div class="glass-card p-5 text-white text-center" style="max-width: 600px; width: 100%;">
+                <h1 class="display-4 mb-4 neon-glow">
+                    <i class="fas fa-futbol me-3"></i>
+                    <span data-en="Football Quiz Pro" data-fa="کوییز فوتبال حرفه‌ای">Football Quiz Pro</span>
+                </h1>
+                
+                <!-- Language Toggle -->
+                <div class="mb-4">
+                    <button id="langToggle" class="btn btn-outline-light">
+                        <i class="fas fa-language me-2"></i>
+                        <span id="langText">فارسی</span>
+                    </button>
+                </div>
+                
+                <!-- User Profile Setup -->
+                <div class="mb-4">
+                    <input type="text" id="playerName" class="form-control mb-3 text-center" 
+                           placeholder="Enter your name / نام خود را وارد کنید" maxlength="20">
+                    
+                    <!-- Avatar Selection -->
+                    <div class="mb-3">
+                        <p class="mb-2" data-en="Choose your avatar:" data-fa="آواتار خود را انتخاب کنید:">Choose your avatar:</p>
+                        <div class="d-flex justify-content-center gap-3 flex-wrap">
+                            <div class="avatar-option selected" data-avatar="⚽">⚽</div>
+                            <div class="avatar-option" data-avatar="🏆">🏆</div>
+                            <div class="avatar-option" data-avatar="👤">👤</div>
+                            <div class="avatar-option" data-avatar="🎯">🎯</div>
+                            <div class="avatar-option" data-avatar="⭐">⭐</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Coins Display -->
+                <div class="coin-counter mb-4 d-inline-block">
+                    <i class="fas fa-coins me-2"></i>
+                    <span id="coinCount">0</span>
+                    <span data-en="Coins" data-fa="سکه">Coins</span>
+                </div>
+                
+                <!-- Daily Reward Wheel -->
+                <div class="mb-4">
+                    <h5 data-en="Daily Reward" data-fa="جایزه روزانه">Daily Reward</h5>
+                    <div class="d-flex justify-content-center mb-3">
+                        <div class="spin-wheel glass-card position-relative" id="spinWheel">
+                            <div class="wheel-pointer"></div>
+                            <div class="wheel-segment" style="background: #ff6b6b; transform: rotate(0deg);"></div>
+                            <div class="wheel-segment" style="background: #4ecdc4; transform: rotate(60deg);"></div>
+                            <div class="wheel-segment" style="background: #45b7d1; transform: rotate(120deg);"></div>
+                            <div class="wheel-segment" style="background: #96ceb4; transform: rotate(180deg);"></div>
+                            <div class="wheel-segment" style="background: #ffeaa7; transform: rotate(240deg);"></div>
+                            <div class="wheel-segment" style="background: #dda0dd; transform: rotate(300deg);"></div>
+                            <div class="position-absolute top-50 start-50 translate-middle text-white fw-bold">
+                                <i class="fas fa-gift"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <button id="spinButton" class="btn btn-warning pulse-button">
+                        <span data-en="Spin Now!" data-fa="چرخاندن!">Spin Now!</span>
+                    </button>
+                    <div id="spinCooldown" class="text-warning mt-2 hidden">
+                        <span data-en="Next spin available in:" data-fa="چرخش بعدی در:">Next spin available in:</span>
+                        <span id="cooldownTimer">23:45:12</span>
+                    </div>
+                </div>
+                
+                <!-- Game Mode Selection -->
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <button id="soloModeBtn" class="btn btn-primary w-100 pulse-button">
+                            <i class="fas fa-user me-2"></i>
+                            <span data-en="Solo Mode" data-fa="حالت تک‌نفره">Solo Mode</span>
+                        </button>
+                    </div>
+                    <div class="col-md-6">
+                        <button id="aiModeBtn" class="btn btn-success w-100">
+                            <i class="fas fa-robot me-2"></i>
+                            <span data-en="VS AI" data-fa="در برابر هوش مصنوعی">VS AI</span>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Shop & Profile Buttons -->
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <button id="shopBtn" class="btn btn-warning w-100">
+                            <i class="fas fa-shopping-cart me-2"></i>
+                            <span data-en="Shop" data-fa="فروشگاه">Shop</span>
+                        </button>
+                    </div>
+                    <div class="col-md-6">
+                        <button id="profileBtn" class="btn btn-info w-100">
+                            <i class="fas fa-user-circle me-2"></i>
+                            <span data-en="Profile" data-fa="پروفایل">Profile</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Game Settings Modal -->
+        <div id="gameSettingsScreen" class="min-h-screen d-flex align-items-center justify-content-center p-4 hidden">
+            <div class="glass-card p-5 text-white" style="max-width: 500px; width: 100%;">
+                <h3 class="text-center mb-4">
+                    <span data-en="Game Settings" data-fa="تنظیمات بازی">Game Settings</span>
+                </h3>
+                
+                <!-- Difficulty Selection -->
+                <div class="mb-4">
+                    <label class="form-label" data-en="Difficulty:" data-fa="سختی:">Difficulty:</label>
+                    <select id="difficultySelect" class="form-select">
+                        <option value="easy" data-en="Easy" data-fa="آسان">Easy</option>
+                        <option value="medium" data-en="Medium" data-fa="متوسط">Medium</option>
+                        <option value="hard" data-en="Hard" data-fa="سخت">Hard</option>
+                        <option value="expert" data-en="Expert" data-fa="حرفه‌ای">Expert</option>
+                    </select>
+                </div>
+                
+                <!-- Question Count -->
+                <div class="mb-4">
+                    <label class="form-label" data-en="Number of Questions:" data-fa="تعداد سوالات:">Number of Questions:</label>
+                    <select id="questionCountSelect" class="form-select">
+                        <option value="5">5</option>
+                        <option value="10" selected>10</option>
+                        <option value="20">20</option>
+                    </select>
+                </div>
+                
+                <!-- Toggles -->
+                <div class="mb-4">
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="checkbox" id="coinQuestionsToggle" checked>
+                        <label class="form-check-label" for="coinQuestionsToggle" data-en="Include Coin Questions" data-fa="شامل سوالات سکه">
+                            Include Coin Questions
+                        </label>
+                    </div>
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="checkbox" id="musicToggleSettings" checked>
+                        <label class="form-check-label" for="musicToggleSettings" data-en="Background Music" data-fa="موسیقی پس‌زمینه">
+                            Background Music
+                        </label>
+                    </div>
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="checkbox" id="animationsToggle" checked>
+                        <label class="form-check-label" for="animationsToggle" data-en="Animations" data-fa="انیمیشن‌ها">
+                            Animations
+                        </label>
+                    </div>
+                </div>
+                
+                <!-- Buttons -->
+                <div class="d-flex gap-3">
+                    <button id="backToLanding" class="btn btn-secondary flex-fill">
+                        <span data-en="Back" data-fa="بازگشت">Back</span>
+                    </button>
+                    <button id="startGameBtn" class="btn btn-primary flex-fill pulse-button">
+                        <span data-en="Start Game" data-fa="شروع بازی">Start Game</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Quiz Screen -->
+        <div id="quizScreen" class="min-h-screen p-4 hidden">
+            <!-- Header -->
+            <div class="glass-card p-3 mb-4">
+                <div class="row align-items-center">
+                    <div class="col-md-3">
+                        <div class="coin-counter">
+                            <i class="fas fa-coins me-2"></i>
+                            <span id="gameCoins">0</span>
+                        </div>
+                    </div>
+                    <div class="col-md-6 text-center">
+                        <div class="text-white">
+                            <span data-en="Question" data-fa="سوال">Question</span>
+                            <span id="currentQuestion">1</span> / <span id="totalQuestions">10</span>
+                        </div>
+                        <div class="progress mt-2">
+                            <div id="progressBar" class="progress-bar progress-bar-animated" style="width: 10%"></div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 text-end">
+                        <div class="text-white">
+                            <span data-en="Score:" data-fa="امتیاز:">Score:</span>
+                            <span id="currentScore">0</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- AI Opponent (if in AI mode) -->
+            <div id="aiOpponent" class="glass-card p-3 mb-4 hidden">
+                <div class="row align-items-center">
+                    <div class="col-md-6">
+                        <div class="d-flex align-items-center">
+                            <div class="me-3">🤖</div>
+                            <div>
+                                <div class="text-white fw-bold">AI Opponent</div>
+                                <div class="progress" style="width: 200px;">
+                                    <div id="aiProgress" class="progress-bar bg-danger" style="width: 0%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 text-end">
+                        <div id="aiStatus" class="text-white ai-thinking">
+                            <span data-en="Thinking..." data-fa="در حال فکر...">Thinking...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Question Card -->
+            <div class="card-flip" id="questionCard">
+                <div class="card-flip-inner">
+                    <div class="card-flip-front">
+                        <div class="glass-card p-4 text-white text-center">
+                            <div id="difficultyBadge" class="badge bg-primary mb-3">Easy</div>
+                            <div id="coinQuestionBadge" class="badge bg-warning mb-3 hidden">
+                                <i class="fas fa-coins me-1"></i>
+                                <span data-en="Coin Question!" data-fa="سوال سکه!">Coin Question!</span>
+                            </div>
+                            <h4 id="questionText" class="mb-4">Loading question...</h4>
+                            
+                            <!-- Options -->
+                            <div class="row g-3" id="optionsContainer">
+                                <div class="col-md-6">
+                                    <div class="option-card glass-card p-3 h-100" data-option="0">
+                                        <span class="option-text">Option A</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="option-card glass-card p-3 h-100" data-option="1">
+                                        <span class="option-text">Option B</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="option-card glass-card p-3 h-100" data-option="2">
+                                        <span class="option-text">Option C</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="option-card glass-card p-3 h-100" data-option="3">
+                                        <span class="option-text">Option D</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Navigation -->
+                            <div class="d-flex justify-content-between mt-4">
+                                <button id="prevBtn" class="btn btn-secondary" disabled>
+                                    <span data-en="Previous" data-fa="قبلی">Previous</span>
+                                </button>
+                                <button id="nextBtn" class="btn btn-primary" disabled>
+                                    <span data-en="Next" data-fa="بعدی">Next</span>
+                                </button>
+                                <button id="submitBtn" class="btn btn-success hidden">
+                                    <span data-en="Submit Quiz" data-fa="ارسال کوییز">Submit Quiz</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Results Screen -->
+        <div id="resultsScreen" class="min-h-screen d-flex align-items-center justify-content-center p-4 hidden">
+            <div class="glass-card p-5 text-white text-center" style="max-width: 600px; width: 100%;">
+                <div id="trophyIcon" class="trophy-animation mb-4" style="font-size: 4rem;">🏆</div>
+                
+                <h2 class="mb-4" data-en="Quiz Complete!" data-fa="کوییز تمام شد!">Quiz Complete!</h2>
+                
+                <div class="row g-4 mb-4">
+                    <div class="col-md-6">
+                        <div class="glass-card p-3">
+                            <h5 data-en="Final Score" data-fa="امتیاز نهایی">Final Score</h5>
+                            <div class="display-6" id="finalScore">0</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="glass-card p-3">
+                            <h5 data-en="Accuracy" data-fa="دقت">Accuracy</h5>
+                            <div class="display-6" id="accuracy">0%</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row g-4 mb-4">
+                    <div class="col-md-4">
+                        <div class="glass-card p-3">
+                            <div class="text-success">
+                                <i class="fas fa-check-circle"></i>
+                                <div id="correctCount">0</div>
+                                <small data-en="Correct" data-fa="درست">Correct</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="glass-card p-3">
+                            <div class="text-danger">
+                                <i class="fas fa-times-circle"></i>
+                                <div id="incorrectCount">0</div>
+                                <small data-en="Incorrect" data-fa="غلط">Incorrect</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="glass-card p-3">
+                            <div class="text-warning">
+                                <i class="fas fa-coins"></i>
+                                <div id="coinsEarned">0</div>
+                                <small data-en="Coins Earned" data-fa="سکه‌های کسب شده">Coins Earned</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="performanceMessage" class="alert alert-info mb-4">
+                    Great job! Keep practicing to improve your score!
+                </div>
+                
+                <!-- AI Results (if applicable) -->
+                <div id="aiResults" class="glass-card p-3 mb-4 hidden">
+                    <h5 data-en="VS AI Results" data-fa="نتایج در برابر هوش مصنوعی">VS AI Results</h5>
+                    <div class="row">
+                        <div class="col-6">
+                            <div data-en="You" data-fa="شما">You</div>
+                            <div id="playerFinalScore" class="h4">0</div>
+                        </div>
+                        <div class="col-6">
+                            <div>AI</div>
+                            <div id="aiFinalScore" class="h4">0</div>
+                        </div>
+                    </div>
+                    <div id="winnerMessage" class="mt-2 fw-bold"></div>
+                </div>
+                
+                <div class="d-flex gap-3 flex-wrap justify-content-center">
+                    <button id="playAgainBtn" class="btn btn-primary">
+                        <span data-en="Play Again" data-fa="بازی دوباره">Play Again</span>
+                    </button>
+                    <button id="shareResultBtn" class="btn btn-success">
+                        <span data-en="Share Result" data-fa="اشتراک نتیجه">Share Result</span>
+                    </button>
+                    <button id="reviewAnswersBtn" class="btn btn-info">
+                        <span data-en="Review Answers" data-fa="بررسی پاسخ‌ها">Review Answers</span>
+                    </button>
+                    <button id="backToMenuBtn" class="btn btn-secondary">
+                        <span data-en="Main Menu" data-fa="منوی اصلی">Main Menu</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Shop Screen -->
+        <div id="shopScreen" class="min-h-screen p-4 hidden">
+            <div class="container">
+                <div class="glass-card p-4 mb-4">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h2 class="text-white mb-0">
+                            <i class="fas fa-shopping-cart me-2"></i>
+                            <span data-en="Shop" data-fa="فروشگاه">Shop</span>
+                        </h2>
+                        <div class="coin-counter">
+                            <i class="fas fa-coins me-2"></i>
+                            <span id="shopCoins">0</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row g-4" id="shopItems">
+                    <!-- Shop items will be populated by JavaScript -->
+                </div>
+                
+                <div class="text-center mt-4">
+                    <button id="backToLandingFromShop" class="btn btn-secondary">
+                        <span data-en="Back to Menu" data-fa="بازگشت به منو">Back to Menu</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Profile Screen -->
+        <div id="profileScreen" class="min-h-screen p-4 hidden">
+            <div class="container">
+                <div class="glass-card p-4 mb-4">
+                    <h2 class="text-white mb-4">
+                        <i class="fas fa-user-circle me-2"></i>
+                        <span data-en="Profile" data-fa="پروفایل">Profile</span>
+                    </h2>
+                    
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <div class="glass-card p-4">
+                                <h5 class="text-white mb-3" data-en="Player Stats" data-fa="آمار بازیکن">Player Stats</h5>
+                                <div class="text-white">
+                                    <div class="mb-2">
+                                        <span data-en="Total Games:" data-fa="کل بازی‌ها:">Total Games:</span>
+                                        <span id="totalGames" class="float-end">0</span>
+                                    </div>
+                                    <div class="mb-2">
+                                        <span data-en="Best Score:" data-fa="بهترین امتیاز:">Best Score:</span>
+                                        <span id="bestScore" class="float-end">0</span>
+                                    </div>
+                                    <div class="mb-2">
+                                        <span data-en="Average Accuracy:" data-fa="میانگین دقت:">Average Accuracy:</span>
+                                        <span id="avgAccuracy" class="float-end">0%</span>
+                                    </div>
+                                    <div class="mb-2">
+                                        <span data-en="Total Coins:" data-fa="کل سکه‌ها:">Total Coins:</span>
+                                        <span id="profileCoins" class="float-end">0</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="glass-card p-4">
+                                <h5 class="text-white mb-3" data-en="Unlocked Items" data-fa="آیتم‌های باز شده">Unlocked Items</h5>
+                                <div id="unlockedItems" class="text-white">
+                                    <!-- Will be populated by JavaScript -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="text-center">
+                    <button id="backToLandingFromProfile" class="btn btn-secondary">
+                        <span data-en="Back to Menu" data-fa="بازگشت به منو">Back to Menu</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="script.js"></script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'98e63015b10441aa',t:'MTc2MDQzNTU4Ny4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
